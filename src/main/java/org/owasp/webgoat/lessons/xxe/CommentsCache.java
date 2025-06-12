@@ -65,16 +65,13 @@ public class CommentsCache {
    * progress etc). In real life the XmlMapper bean defined above will be used automatically and the
    * Comment class can be directly used in the controller method (instead of a String)
    */
-  protected Comment parseXml(String xml, boolean securityEnabled)
-      throws XMLStreamException, JAXBException {
+  protected Comment parseXml(String xml) throws XMLStreamException, JAXBException {
     var jc = JAXBContext.newInstance(Comment.class);
     var xif = XMLInputFactory.newInstance();
 
-    // TODO fix me disabled for now.
-    if (securityEnabled) {
-      xif.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Compliant
-      xif.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // compliant
-    }
+    // Securely configure XMLInputFactory to prevent XXE attacks
+    xif.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, ""); // Disallow DTDs
+    xif.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, ""); // Disallow external schemas
 
     var xsr = xif.createXMLStreamReader(new StringReader(xml));
 
